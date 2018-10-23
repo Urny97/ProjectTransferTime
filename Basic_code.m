@@ -18,6 +18,9 @@ for i=1:no_frames
     %% Frame processing here %%
 end
 
-test = im2bw(read(vid,160), 0.795);
+test=read(vid,160);
+test_bin=imbinarize(test, 0.795);
 imshow(test)
-
+se = strel('disk',10);
+dil=imdilate(test, se);
+imshow(dil)
