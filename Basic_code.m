@@ -1,53 +1,58 @@
 clear;
 clc;
 
-% create video  object
-vid = VideoReader('Wandeling_1a.mp4');
+videos = ["Wandeling_1a.mp4", "Wandeling_1b.mp4", "Wandeling_1c.mp4", "Wandeling_2a.mp4", "Wandeling_2b.mp4", "Wandeling_2c.mp4"];
+walkLength = 3.15;
 
-%Get properties from video
-framerate = vid.framerate;
-duration = vid.duration;
-no_frames = vid.NumberOfFrames;
-vidHeight = vid.Height;
-vidWidth = vid.Width;
+for j = 1 : length(videos)
+    % create video  object
+    vid = VideoReader(videos(j));
 
-frames = zeros(0, no_frames - 1);
+    %Get properties from video
+    framerate = vid.framerate;
+    duration = vid.duration;
+    vidHeight = vid.Height;
+    vidWidth = vid.Width;
 
-entry = 1;
-exit = 0;
-treshold = 0.87;
-startFrame = im2bw(read(vid,1), treshold);
 
-%get video frames
-for i=1:no_frames
-    frame = read(vid,i);
-    
-    %% Frame processing here %%;
-    whiteDots = im2bw(frame, treshold) - startFrame;
-    %imshow(whiteDots)
-    hasWhitePixels = containsWhitePixels(whiteDots);
-    
-    if(hasWhitePixels == 1 && entry == 1)
-       entryFrame = i;
-       entry = 0;
-       exit = 1;
+    entryState = 1;
+    exitState = 0;
+    treshold = 0.89;
+    entryFrame = -1;
+    exitFrame = -1;
+
+    %get video frames
+    i = 0;
+    while hasFrame(vid)
+        frame = readFrame(vid);
+        
+        if (i == 0)
+            startFrame = im2bw(frame, treshold);
+        end
+        
+        whiteDots = im2bw(frame, treshold) - startFrame;
+        hasWhitePixels = containsWhitePixels(whiteDots);
+        
+        if(hasWhitePixels == 1 && entryState == 1)
+        entryFrame = i;
+        entryState = 0;
+        exitState = 1;
+        end
+        
+        if(hasWhitePixels == 0 && exitState == 1)
+            exitFrame = i;
+            exitState = 0;
+            break
+        end
+        
+        i = i + 1;
     end
     
-    if(hasWhitePixels == 0 && exit == 1)
-        exitFrame = i;
-        exit = 0;
-    end
+    videos(j)
+    speed = 3.15 / ((exitFrame - entryFrame) / framerate)
 end
 
-%load frames
-%implay(vid);
 
-%test = im2bw(read(vid,160), 0.9);
-%testWhite = test > 0.8
-%L = bwlabel(test);
-%imshow(test)
-
-speed = 3.15 / ((exitFrame - entryFrame) / framerate)
 
 function output = containsWhitePixels(image)
     output = 0;
@@ -61,8 +66,4 @@ function output = containsWhitePixels(image)
            end
         end
     end
-    
-    %if(output ~= 1) 
-     %   output = 0;
-    %end
 end
