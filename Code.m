@@ -56,7 +56,7 @@ for i = 1 : length(videos)
         end
     end
 
-    figure,
+    figure('Name', videos(i), 'NumberTitle', 'off')
     plot(valrange, plotVals, valrange(maxima), plotVals(maxima), 'bo');
     xlabel("Frame");
     ylabel("Height (in pixels)");
