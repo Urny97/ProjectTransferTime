@@ -1,5 +1,6 @@
 clear;
 clc;
+close all;
 
 videos = ["Wandeling_1a", "Wandeling_1b", "Wandeling_1c", "Wandeling_2a", "Wandeling_2b", "Wandeling_2c"];
 newVideoEnds = [250 290 220 170 230 330];
@@ -34,7 +35,7 @@ for i = 1 : length(videos)
 
         if (containsWhitePixels(binframe) == 1)
             props = regionprops(binframe, 'Centroid');
-            plotVals(pos) = props(1).Centroid(2);
+            plotVals(pos) = vheight - props(1).Centroid(2);
             
             if (startPoint == -1) startPoint = pos; 
             else endPoint = pos; end
@@ -57,6 +58,9 @@ for i = 1 : length(videos)
 
     figure,
     plot(valrange, plotVals, valrange(maxima), plotVals(maxima), 'bo');
+    xlabel("Frame");
+    ylabel("Height (in pixels)");
+    ylim([325 400]);
     hold on
 
     disp(sprintf('\ttotal speed = %f m/s', walkLength / ((endPoint - startPoint) / framerate)));
